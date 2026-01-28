@@ -291,15 +291,35 @@ export default {
       --shadow: rgba(15, 23, 42, 0.10);
     }
 
-    /* Cloudflare signature-ish mesh gradients */
+    /* Prevent background "leaks" during force-scroll/overscroll */
+    html, body {
+      min-height: 100%;
+      background-color: var(--bg);
+    }
+
+    /* Cloudflare signature-ish mesh gradients (fixed behind glass) */
     body {
-      background:
-        radial-gradient(1100px 650px at 20% -10%, color-mix(in srgb, var(--cf-orange) 45%, transparent), transparent 60%),
-        radial-gradient(1100px 650px at 80% -10%, color-mix(in srgb, var(--cf-blue) 40%, transparent), transparent 60%),
-        radial-gradient(900px 520px at 50% 110%, color-mix(in srgb, var(--cf-blue) 18%, transparent), transparent 70%),
-        linear-gradient(180deg, var(--bg), var(--bg));
       color: var(--text);
       transition: background var(--ease), color var(--ease);
+      position: relative;
+      isolation: isolate; /* guarantees z-index layering works as intended */
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -25vh -25vw; /* oversized to cover overscroll gaps */
+      z-index: -1;
+      background:
+        radial-gradient(1100px 650px at 20% -10%, color-mix(in srgb, var(--cf-orange) 48%, transparent), transparent 60%),
+        radial-gradient(1100px 650px at 80% -10%, color-mix(in srgb, var(--cf-blue) 42%, transparent), transparent 60%),
+        radial-gradient(900px 520px at 50% 110%, color-mix(in srgb, var(--cf-blue) 18%, transparent), transparent 70%),
+        linear-gradient(180deg, var(--bg), var(--bg));
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-size: cover;
+      pointer-events: none;
+      transform: translateZ(0);
     }
 
     .glass {
@@ -307,7 +327,10 @@ export default {
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border: 1px solid var(--card-border);
-      box-shadow: 0 18px 55px var(--shadow);
+      /* Soft shadows (Apple-style) so mesh gradient stays visible */
+      box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.10),
+        0 2px 10px rgba(15, 23, 42, 0.06);
       transition: background-color var(--ease), border-color var(--ease), box-shadow var(--ease);
     }
 
@@ -362,11 +385,25 @@ export default {
           </div>
         </div>
         <div class="flex items-center gap-3 text-xs sm:text-sm">
-          <span class="chip inline-flex items-center gap-1 px-2.5 py-1 rounded-full border soft-divider"
-                style="background: color-mix(in srgb, var(--cf-blue) 12%, transparent); color: color-mix(in srgb, var(--text) 85%, transparent);">
-            <span class="h-1.5 w-1.5 rounded-full animate-pulse" style="background: var(--cf-orange);"></span>
-            Live · Sentinel active
-          </span>
+          <!-- Sentinel Active indicator w/ tooltip -->
+          <div class="relative group">
+            <span class="chip inline-flex items-center gap-2 px-2.5 py-1 rounded-full border soft-divider"
+                  style="background: color-mix(in srgb, var(--cf-blue) 10%, transparent); color: color-mix(in srgb, var(--text) 88%, transparent);">
+              <span class="relative inline-flex h-2.5 w-2.5 items-center justify-center">
+                <span class="absolute inline-flex h-2.5 w-2.5 rounded-full opacity-40 animate-ping" style="background: #22c55e;"></span>
+                <span class="inline-flex h-2 w-2 rounded-full" style="background:#22c55e; box-shadow: 0 0 0.65rem rgba(34,197,94,0.75), 0 0 1.35rem rgba(34,197,94,0.35);"></span>
+              </span>
+              <span>Sentinel active</span>
+            </span>
+            <div class="pointer-events-none absolute right-0 top-full mt-2 hidden group-hover:block">
+              <div class="glass rounded-2xl px-3 py-2 text-[11px] leading-snug"
+                   style="min-width: 20rem; color: color-mix(in srgb, var(--text) 90%, transparent);">
+                Active on: <span class="font-semibold">MY_WORKFLOW</span>
+                <span class="mx-1 opacity-60">|</span>
+                Deployed at: <span class="font-semibold">cloudflarepm.cloudflare-neelakolkar.workers.dev</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Light/Dark toggle (top-right, premium icon) -->
           <button id="theme-toggle"
@@ -489,16 +526,16 @@ export default {
                 <div class="flex items-center justify-between gap-3 mb-4">
                   <div>
                     <h2 class="text-sm sm:text-base font-semibold tracking-tight">
-                      Theme Distribution
+                      Intelligence Coverage
                     </h2>
                     <p class="text-xs sm:text-sm" style="color: var(--muted);">
-                      Where product teams should focus: bugs vs feature requests and more.
+                      A high-level radar view of how feedback spans key themes.
                     </p>
                   </div>
                   <span class="chip inline-flex items-center gap-1 rounded-full border soft-divider px-2 py-0.5 text-[11px]"
                         style="background: color-mix(in srgb, var(--cf-blue) 10%, transparent); color: color-mix(in srgb, var(--text) 80%, transparent);">
                     <span class="h-1.5 w-1.5 rounded-full" style="background: var(--cf-blue);"></span>
-                    Chart.js · Themes
+                    Chart.js · Radar
                   </span>
                 </div>
                 <div class="h-64 sm:h-72">
@@ -734,15 +771,21 @@ export default {
       return date.toLocaleDateString();
     }
 
+    function isLightTheme() {
+      return (document.documentElement.getAttribute("data-theme") || "dark") === "light";
+    }
+
     // High-quality brand SVGs via SimpleIcons CDN (no inline SVG bloat).
+    // Use high-contrast logos in light mode so they remain visible.
     function getSourceLogoUrl(source) {
+      const color = isLightTheme() ? "0f172a" : "ffffff"; // slate-900 vs white
       const s = (source || "").toLowerCase();
       // SimpleIcons slugs: github, discord, x, intercom
-      if (s.includes("github")) return "https://cdn.simpleicons.org/github/ffffff";
-      if (s.includes("discord")) return "https://cdn.simpleicons.org/discord/ffffff";
-      if (s === "x" || s.includes("twitter")) return "https://cdn.simpleicons.org/x/ffffff";
-      if (s.includes("intercom")) return "https://cdn.simpleicons.org/intercom/ffffff";
-      return "https://cdn.simpleicons.org/cloudflare/ffffff";
+      if (s.includes("github")) return "https://cdn.simpleicons.org/github/" + color;
+      if (s.includes("discord")) return "https://cdn.simpleicons.org/discord/" + color;
+      if (s === "x" || s.includes("twitter")) return "https://cdn.simpleicons.org/x/" + color;
+      if (s.includes("intercom")) return "https://cdn.simpleicons.org/intercom/" + color;
+      return "https://cdn.simpleicons.org/cloudflare/" + color;
     }
 
     function getStatus(row) {
@@ -810,30 +853,34 @@ export default {
     }
 
     function updateThemeChart(rows) {
+      // Radar chart mapping the 4 themes (Bug, UI/UX, Performance, Feature Request)
+      // with Cloudflare styling: orange border + semi-transparent indigo fill.
       const { themes, counts } = computeThemeStats(rows);
-      const data = themes.map((t) => counts[t]);
+
+      const ordered = ["Bug", "UI/UX", "Performance", "Feature Request"];
+      const data = ordered.map((t) => counts[t] || 0);
       const ctx = document.getElementById("themeChart").getContext("2d");
       if (themeChart) {
+        themeChart.data.labels = ordered;
         themeChart.data.datasets[0].data = data;
         themeChart.update();
         return;
       }
       themeChart = new Chart(ctx, {
-        type: "bar",
+        type: "radar",
         data: {
-          labels: themes,
+          labels: ordered,
           datasets: [
             {
-              label: "Feedback count",
+              label: "Intelligence Coverage",
               data,
-              backgroundColor: [
-                "rgba(0, 81, 195, 0.55)",    // UI/UX (CF blue)
-                "rgba(243, 128, 32, 0.82)",  // Bug (CF orange emphasis)
-                "rgba(245, 158, 11, 0.78)",  // Performance (amber)
-                "rgba(0, 81, 195, 0.85)",    // Feature Request (CF blue)
-              ],
-              borderRadius: 8,
-              borderWidth: 0,
+              backgroundColor: "rgba(79, 70, 229, 0.22)", // indigo fill
+              borderColor: "#F38020", // Cloudflare orange
+              pointBackgroundColor: "#F38020",
+              pointBorderColor: "#F38020",
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              borderWidth: 2,
             },
           ],
         },
@@ -843,7 +890,7 @@ export default {
           plugins: {
             legend: {
               labels: {
-                color: getComputedStyle(document.documentElement).getPropertyValue("--text") || "#e5e7eb",
+                color: getComputedStyle(document.documentElement).getPropertyValue("--text") || "#0f172a",
                 font: { size: 11 },
               },
             },
@@ -857,23 +904,19 @@ export default {
             },
           },
           scales: {
-            x: {
+            r: {
+              beginAtZero: true,
               ticks: {
-                color: "rgba(148,163,184,0.9)",
-                font: { size: 11 },
-              },
-              grid: {
-                display: false,
-              },
-            },
-            y: {
-              ticks: {
-                color: "rgba(148,163,184,0.7)",
-                font: { size: 10 },
+                color: "rgba(148,163,184,0.75)",
+                backdropColor: "transparent",
                 precision: 0,
+                font: { size: 10 },
               },
-              grid: {
-                color: "rgba(148,163,184,0.16)",
+              angleLines: { color: "rgba(148,163,184,0.16)" },
+              grid: { color: "rgba(148,163,184,0.14)" },
+              pointLabels: {
+                color: getComputedStyle(document.documentElement).getPropertyValue("--text") || "#0f172a",
+                font: { size: 11, weight: "600" },
               },
             },
           },
