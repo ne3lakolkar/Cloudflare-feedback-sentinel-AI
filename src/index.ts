@@ -319,6 +319,14 @@ export default {
       transition: background-color var(--ease), border-color var(--ease), color var(--ease);
     }
 
+    .card {
+      transition: transform var(--ease), background-color var(--ease), border-color var(--ease), box-shadow var(--ease);
+      will-change: transform;
+    }
+    .card:hover {
+      transform: scale(1.01);
+    }
+
     /* Icon logos */
     .brand-logo {
       filter: saturate(1.05);
@@ -332,8 +340,8 @@ export default {
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <!-- Cloudflare logo (inline SVG) -->
-          <div class="h-9 w-9 rounded-2xl glass flex items-center justify-center">
-            <svg width="22" height="22" viewBox="0 0 64 64" fill="none" aria-label="Cloudflare" role="img">
+          <div class="h-8 w-8 mr-1 rounded-2xl glass flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 64 64" fill="none" aria-label="Cloudflare" role="img">
               <path d="M23.5 44.6H49.8c5 0 9.2-4.1 9.2-9.2 0-4.7-3.6-8.7-8.3-9.1C49.1 17.3 41.8 11 32.9 11c-7.6 0-14.1 4.6-16.9 11.2-.6-.1-1.2-.1-1.9-.1-6.2 0-11.2 5-11.2 11.2 0 5.9 4.6 10.7 10.4 11.2h10.2z" fill="url(#cfGrad)"/>
               <defs>
                 <linearGradient id="cfGrad" x1="10" y1="12" x2="54" y2="52" gradientUnits="userSpaceOnUse">
@@ -360,7 +368,7 @@ export default {
             Live · Sentinel active
           </span>
 
-          <!-- Light/Dark toggle -->
+          <!-- Light/Dark toggle (top-right, premium icon) -->
           <button id="theme-toggle"
             class="chip inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium border soft-divider hover:opacity-90"
             style="background: color-mix(in srgb, var(--card) 75%, transparent);"
@@ -381,7 +389,7 @@ export default {
           <!-- Left: metrics, chart, table -->
           <section class="space-y-6 lg:space-y-8">
             <!-- Sentiment Glance -->
-            <div class="glass rounded-3xl p-5 sm:p-6">
+            <div class="glass card rounded-3xl p-5 sm:p-6">
               <div class="flex items-center justify-between gap-4 mb-4">
                 <div>
                   <h2 class="text-sm sm:text-base font-semibold tracking-tight">
@@ -398,14 +406,14 @@ export default {
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <!-- Positive -->
-                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4"
+                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4 card"
                      style="border-color: color-mix(in srgb, #10b981 28%, transparent); background: linear-gradient(135deg, color-mix(in srgb, #10b981 18%, transparent), color-mix(in srgb, var(--card) 92%, transparent));">
                   <div class="flex items-center justify-between gap-2">
                     <div>
                       <p class="text-[11px] uppercase tracking-[0.18em]" style="color: color-mix(in srgb, #10b981 80%, var(--text));">
                         Positive
                       </p>
-                      <p id="sentiment-positive-count" class="mt-1 text-2xl sm:text-3xl font-semibold">
+                      <p id="sentiment-positive-count" class="mt-1 text-2xl sm:text-3xl font-semibold tabular-nums">
                         0
                       </p>
                     </div>
@@ -423,14 +431,14 @@ export default {
                 </div>
 
                 <!-- Neutral -->
-                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4"
+                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4 card"
                      style="border-color: color-mix(in srgb, var(--card-border) 75%, transparent); background: linear-gradient(135deg, color-mix(in srgb, #94a3b8 12%, transparent), color-mix(in srgb, var(--card) 92%, transparent));">
                   <div class="flex items-center justify-between gap-2">
                     <div>
                       <p class="text-[11px] uppercase tracking-[0.18em]" style="color: color-mix(in srgb, var(--text) 72%, transparent);">
                         Neutral
                       </p>
-                      <p id="sentiment-neutral-count" class="mt-1 text-2xl sm:text-3xl font-semibold">
+                      <p id="sentiment-neutral-count" class="mt-1 text-2xl sm:text-3xl font-semibold tabular-nums">
                         0
                       </p>
                     </div>
@@ -448,14 +456,14 @@ export default {
                 </div>
 
                 <!-- Negative -->
-                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4"
+                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4 card"
                      style="border-color: color-mix(in srgb, #f43f5e 30%, transparent); background: linear-gradient(135deg, color-mix(in srgb, #f43f5e 18%, transparent), color-mix(in srgb, var(--card) 92%, transparent));">
                   <div class="flex items-center justify-between gap-2">
                     <div>
                       <p class="text-[11px] uppercase tracking-[0.18em]" style="color: color-mix(in srgb, #f43f5e 78%, var(--text));">
                         Negative
                       </p>
-                      <p id="sentiment-negative-count" class="mt-1 text-2xl sm:text-3xl font-semibold">
+                      <p id="sentiment-negative-count" class="mt-1 text-2xl sm:text-3xl font-semibold tabular-nums">
                         0
                       </p>
                     </div>
@@ -477,7 +485,7 @@ export default {
             <!-- Theme bar chart + recent feedback table -->
             <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)] gap-6">
               <!-- Chart card -->
-              <div class="glass rounded-3xl p-5 sm:p-6">
+              <div class="glass card rounded-3xl p-5 sm:p-6">
                 <div class="flex items-center justify-between gap-3 mb-4">
                   <div>
                     <h2 class="text-sm sm:text-base font-semibold tracking-tight">
@@ -499,7 +507,7 @@ export default {
               </div>
 
               <!-- Recent feedback table -->
-              <div class="glass rounded-3xl p-5 sm:p-6">
+              <div class="glass card rounded-3xl p-5 sm:p-6">
                 <div class="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <h2 class="text-sm sm:text-base font-semibold tracking-tight">
@@ -518,16 +526,17 @@ export default {
                 <div class="relative overflow-hidden rounded-2xl border soft-divider"
                      style="background: color-mix(in srgb, var(--card) 65%, transparent);">
                   <div class="max-h-80 overflow-auto scrollbar-thin scrollbar-thumb-slate-700/70 scrollbar-track-slate-900/60">
-                    <table class="min-w-full text-left text-xs sm:text-sm">
+                    <!-- table-fixed + explicit column widths prevents badge/content collisions -->
+                    <table class="min-w-full table-fixed text-left text-xs sm:text-sm">
                       <thead class="sticky top-0 z-10"
                              style="background: color-mix(in srgb, var(--card) 90%, transparent); color: color-mix(in srgb, var(--text) 70%, transparent);">
                         <tr>
-                          <th class="px-3 sm:px-4 py-2.5 font-medium">Source</th>
+                          <th class="w-[9.5rem] px-3 sm:px-4 py-2.5 font-medium">Source</th>
                           <th class="px-3 sm:px-4 py-2.5 font-medium">Feedback</th>
-                          <th class="px-3 sm:px-4 py-2.5 font-medium">Status</th>
-                          <th class="px-3 sm:px-4 py-2.5 font-medium">Sentiment</th>
-                          <th class="px-3 sm:px-4 py-2.5 font-medium">Theme</th>
-                          <th class="px-3 sm:px-4 py-2.5 font-medium">When</th>
+                          <th class="w-[9.5rem] px-3 sm:px-4 py-2.5 font-medium">Status</th>
+                          <th class="w-[7.5rem] px-3 sm:px-4 py-2.5 font-medium">Sentiment</th>
+                          <th class="w-[9.5rem] px-3 sm:px-4 py-2.5 font-medium">Theme</th>
+                          <th class="w-[6.5rem] px-3 sm:px-4 py-2.5 font-medium">When</th>
                         </tr>
                       </thead>
                       <tbody id="feedback-table-body" style="border-top: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);">
@@ -547,7 +556,7 @@ export default {
           </section>
 
           <!-- Right: Simulated Ingest sidebar -->
-          <aside class="glass rounded-3xl p-5 sm:p-6">
+          <aside class="glass card rounded-3xl p-5 sm:p-6 pb-8">
             <div class="flex items-start justify-between gap-3 mb-4">
               <div>
                 <h2 class="text-sm sm:text-base font-semibold tracking-tight">
@@ -565,7 +574,7 @@ export default {
               </span>
             </div>
 
-            <form id="ingest-form" class="space-y-4">
+            <form id="ingest-form" class="space-y-5">
               <div class="space-y-2">
                 <label for="source" class="block text-xs font-medium" style="color: color-mix(in srgb, var(--text) 78%, transparent);">
                   Feedback Source
@@ -619,7 +628,7 @@ export default {
                   id="analyze-button"
                   type="submit"
                   class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
-                  style="background: linear-gradient(135deg, var(--cf-blue), color-mix(in srgb, var(--cf-orange) 70%, var(--cf-blue))); box-shadow: 0 14px 35px color-mix(in srgb, var(--cf-blue) 25%, transparent);"
+                  style="background: linear-gradient(135deg, #F38020, #FAAE40); box-shadow: 0 14px 35px color-mix(in srgb, #F38020 18%, transparent);"
                 >
                   <span id="analyze-button-label" class="inline-flex items-center gap-1">
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
@@ -632,7 +641,7 @@ export default {
                 </button>
               </div>
 
-              <p id="ingest-status" class="text-[11px] min-h-[1.25rem]" style="color: var(--muted);">
+              <p id="ingest-status" class="text-[11px] min-h-[1.25rem] pt-1" style="color: var(--muted);">
                 Paste feedback, hit Analyze, then watch sentiment &amp; themes update.
               </p>
             </form>
@@ -908,7 +917,7 @@ export default {
         contentCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm";
         const safeContent = row.content || "";
         contentCell.innerHTML = \`
-          <div class="line-clamp-3" title="\${safeContent.replace(/"/g, '&quot;')}" style="color: color-mix(in srgb, var(--text) 88%, transparent);">
+          <div class="line-clamp-2 break-words" title="\${safeContent.replace(/"/g, '&quot;')}" style="color: color-mix(in srgb, var(--text) 88%, transparent);">
             \${safeContent}
           </div>
         \`;
