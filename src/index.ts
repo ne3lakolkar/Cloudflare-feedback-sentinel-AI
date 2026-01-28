@@ -257,6 +257,13 @@ export default {
   <!-- Lucide Icons for source + UI icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* Tailwind's animate-ping equivalent, but duration is controlled by --pulse-duration */
+    @keyframes ping {
+      75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
     /* Cloudflare palette */
     :root {
       --cf-orange: #F38020;
@@ -264,6 +271,7 @@ export default {
       --cf-slate: #1A1A1A;
 
       --ease: 0.3s ease;
+      --pulse-duration: 18s; /* shared rhythm for background + status */
     }
 
     html {
@@ -274,19 +282,19 @@ export default {
     /* Theme tokens (light/dark) */
     html[data-theme="dark"] {
       color-scheme: dark;
-      --bg: #0b0b0d;
+      --bg: #0F172A; /* deep slate base */
       --text: #f8fafc;
       --muted: rgba(148, 163, 184, 0.75);
-      --card: rgba(26, 26, 26, 0.70);
+      --glass-bg: rgba(255, 255, 255, 0.05); /* bg-white/5 */
       --card-border: rgba(148, 163, 184, 0.18);
       --shadow: rgba(0, 0, 0, 0.55);
     }
     html[data-theme="light"] {
       color-scheme: light;
-      --bg: #f8fafc;
+      --bg: #F8FAFC; /* crisp base */
       --text: #0f172a;
       --muted: rgba(51, 65, 85, 0.72);
-      --card: rgba(255, 255, 255, 0.72);
+      --glass-bg: rgba(255, 255, 255, 0.40); /* bg-white/40 */
       --card-border: rgba(15, 23, 42, 0.12);
       --shadow: rgba(15, 23, 42, 0.10);
     }
@@ -297,7 +305,22 @@ export default {
       background-color: var(--bg);
     }
 
-    /* Cloudflare signature-ish mesh gradients (fixed behind glass) */
+    /* Pulsating Mesh Gradient (fixed behind glass) */
+    @keyframes pulse-gradient {
+      0% {
+        transform: translate3d(-1.5%, -1%, 0) scale(1);
+        opacity: 0.95;
+      }
+      50% {
+        transform: translate3d(1.5%, 1%, 0) scale(1.04);
+        opacity: 0.82;
+      }
+      100% {
+        transform: translate3d(-1.5%, -1%, 0) scale(1);
+        opacity: 0.95;
+      }
+    }
+
     body {
       color: var(--text);
       transition: background var(--ease), color var(--ease);
@@ -308,24 +331,26 @@ export default {
     body::before {
       content: "";
       position: fixed;
-      inset: -25vh -25vw; /* oversized to cover overscroll gaps */
+      inset: -30vh -30vw; /* oversized to cover overscroll gaps */
       z-index: -1;
+      /* Three "breathing" blobs: orange, blue, indigo */
       background:
-        radial-gradient(1100px 650px at 20% -10%, color-mix(in srgb, var(--cf-orange) 48%, transparent), transparent 60%),
-        radial-gradient(1100px 650px at 80% -10%, color-mix(in srgb, var(--cf-blue) 42%, transparent), transparent 60%),
-        radial-gradient(900px 520px at 50% 110%, color-mix(in srgb, var(--cf-blue) 18%, transparent), transparent 70%),
+        radial-gradient(900px 600px at 22% 18%, rgba(243, 128, 32, 0.55), transparent 62%),
+        radial-gradient(980px 650px at 78% 22%, rgba(0, 81, 195, 0.52), transparent 62%),
+        radial-gradient(1050px 720px at 52% 78%, rgba(79, 70, 229, 0.40), transparent 64%),
         linear-gradient(180deg, var(--bg), var(--bg));
       background-attachment: fixed;
       background-repeat: no-repeat;
       background-size: cover;
       pointer-events: none;
       transform: translateZ(0);
+      animation: pulse-gradient var(--pulse-duration) ease-in-out infinite;
     }
 
     .glass {
-      background: var(--card);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px); /* ~backdrop-blur-xl */
+      -webkit-backdrop-filter: blur(28px);
       border: 1px solid var(--card-border);
       /* Soft shadows (Apple-style) so mesh gradient stays visible */
       box-shadow:
@@ -390,7 +415,9 @@ export default {
             <span class="chip inline-flex items-center gap-2 px-2.5 py-1 rounded-full border soft-divider"
                   style="background: color-mix(in srgb, var(--cf-blue) 10%, transparent); color: color-mix(in srgb, var(--text) 88%, transparent);">
               <span class="relative inline-flex h-2.5 w-2.5 items-center justify-center">
-                <span class="absolute inline-flex h-2.5 w-2.5 rounded-full opacity-40 animate-ping" style="background: #22c55e;"></span>
+                <!-- Sync pulse rhythm with background via --pulse-duration -->
+                <span class="absolute inline-flex h-2.5 w-2.5 rounded-full opacity-40"
+                      style="background: #22c55e; animation: ping var(--pulse-duration) ease-in-out infinite;"></span>
                 <span class="inline-flex h-2 w-2 rounded-full" style="background:#22c55e; box-shadow: 0 0 0.65rem rgba(34,197,94,0.75), 0 0 1.35rem rgba(34,197,94,0.35);"></span>
               </span>
               <span>Sentinel active</span>
