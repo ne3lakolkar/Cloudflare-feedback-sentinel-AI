@@ -227,11 +227,29 @@ export default {
 		// High-fidelity dashboard for the root route.
 		if (url.pathname === "/" && req.method === "GET") {
 			const html = `<!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Feedback Intelligence Dashboard</title>
+  <title>Cloudflare Feedback Sentinel AI</title>
+  <!-- Inter typeface (professional SaaS default) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Tailwind config must be defined before the CDN script -->
+  <script>
+    tailwind = {
+      config: {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"],
+            },
+          },
+        },
+      },
+    };
+  </script>
   <!-- Tailwind via CDN for rapid, modern styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js for simple theme bar chart -->
@@ -239,44 +257,119 @@ export default {
   <!-- Lucide Icons for source + UI icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* Cloudflare palette */
     :root {
+      --cf-orange: #F38020;
+      --cf-blue: #0051C3;
+      --cf-slate: #1A1A1A;
+
+      --ease: 0.3s ease;
+    }
+
+    html {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial;
+      transition: background-color var(--ease), color var(--ease);
+    }
+
+    /* Theme tokens (light/dark) */
+    html[data-theme="dark"] {
       color-scheme: dark;
+      --bg: #0b0b0d;
+      --text: #f8fafc;
+      --muted: rgba(148, 163, 184, 0.75);
+      --card: rgba(26, 26, 26, 0.70);
+      --card-border: rgba(148, 163, 184, 0.18);
+      --shadow: rgba(0, 0, 0, 0.55);
     }
+    html[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --muted: rgba(51, 65, 85, 0.72);
+      --card: rgba(255, 255, 255, 0.72);
+      --card-border: rgba(15, 23, 42, 0.12);
+      --shadow: rgba(15, 23, 42, 0.10);
+    }
+
+    /* Cloudflare signature-ish mesh gradients */
     body {
-      background: radial-gradient(circle at top, rgba(79,70,229,0.25), transparent 55%),
-                  radial-gradient(circle at bottom, rgba(15,23,42,1), rgba(15,23,42,1));
+      background:
+        radial-gradient(1100px 650px at 20% -10%, color-mix(in srgb, var(--cf-orange) 45%, transparent), transparent 60%),
+        radial-gradient(1100px 650px at 80% -10%, color-mix(in srgb, var(--cf-blue) 40%, transparent), transparent 60%),
+        radial-gradient(900px 520px at 50% 110%, color-mix(in srgb, var(--cf-blue) 18%, transparent), transparent 70%),
+        linear-gradient(180deg, var(--bg), var(--bg));
+      color: var(--text);
+      transition: background var(--ease), color var(--ease);
     }
+
     .glass {
-      background: rgba(15,23,42,0.8);
+      background: var(--card);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(148,163,184,0.25);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 18px 55px var(--shadow);
+      transition: background-color var(--ease), border-color var(--ease), box-shadow var(--ease);
+    }
+
+    .soft-divider {
+      border-color: color-mix(in srgb, var(--card-border) 55%, transparent);
+    }
+
+    .chip {
+      transition: background-color var(--ease), border-color var(--ease), color var(--ease);
+    }
+
+    /* Icon logos */
+    .brand-logo {
+      filter: saturate(1.05);
     }
   </style>
 </head>
-<body class="h-full min-h-screen text-slate-100 antialiased">
+<body class="h-full min-h-screen antialiased">
   <div class="min-h-screen flex flex-col">
     <!-- Top nav -->
-    <header class="border-b border-slate-800/60 bg-gradient-to-r from-slate-950/80 via-slate-900/80 to-slate-950/80 backdrop-blur">
+    <header class="border-b soft-divider bg-gradient-to-r from-black/30 via-black/10 to-black/30 backdrop-blur">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <div class="h-9 w-9 rounded-2xl bg-indigo-500/80 flex items-center justify-center shadow-lg shadow-indigo-500/40">
-            <span class="text-lg font-semibold tracking-tight">FI</span>
+          <!-- Cloudflare logo (inline SVG) -->
+          <div class="h-9 w-9 rounded-2xl glass flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 64 64" fill="none" aria-label="Cloudflare" role="img">
+              <path d="M23.5 44.6H49.8c5 0 9.2-4.1 9.2-9.2 0-4.7-3.6-8.7-8.3-9.1C49.1 17.3 41.8 11 32.9 11c-7.6 0-14.1 4.6-16.9 11.2-.6-.1-1.2-.1-1.9-.1-6.2 0-11.2 5-11.2 11.2 0 5.9 4.6 10.7 10.4 11.2h10.2z" fill="url(#cfGrad)"/>
+              <defs>
+                <linearGradient id="cfGrad" x1="10" y1="12" x2="54" y2="52" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#F38020"/>
+                  <stop offset="0.55" stop-color="#F38020"/>
+                  <stop offset="1" stop-color="#0051C3"/>
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
           <div>
             <h1 class="text-sm sm:text-base font-semibold tracking-tight">
-              Feedback Intelligence Pipeline
+              Cloudflare Feedback Sentinel AI
             </h1>
-            <p class="text-xs sm:text-sm text-slate-400">
-              Cloudflare PM Intern · Noisy feedback in, actionable insights out.
+            <p class="text-xs sm:text-sm" style="color: var(--muted);">
+              Professional feedback intelligence console · Workflows + D1 + Workers AI
             </p>
           </div>
         </div>
         <div class="flex items-center gap-3 text-xs sm:text-sm">
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Live · Backed by Workers, D1 &amp; AI
+          <span class="chip inline-flex items-center gap-1 px-2.5 py-1 rounded-full border soft-divider"
+                style="background: color-mix(in srgb, var(--cf-blue) 12%, transparent); color: color-mix(in srgb, var(--text) 85%, transparent);">
+            <span class="h-1.5 w-1.5 rounded-full animate-pulse" style="background: var(--cf-orange);"></span>
+            Live · Sentinel active
           </span>
+
+          <!-- Light/Dark toggle -->
+          <button id="theme-toggle"
+            class="chip inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium border soft-divider hover:opacity-90"
+            style="background: color-mix(in srgb, var(--card) 75%, transparent);"
+            type="button"
+            aria-label="Toggle theme"
+            title="Toggle Light/Dark">
+            <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+            <span id="theme-label">Dark</span>
+          </button>
         </div>
       </div>
     </header>
@@ -288,39 +381,41 @@ export default {
           <!-- Left: metrics, chart, table -->
           <section class="space-y-6 lg:space-y-8">
             <!-- Sentiment Glance -->
-            <div class="glass rounded-3xl p-5 sm:p-6 shadow-xl shadow-slate-950/60">
+            <div class="glass rounded-3xl p-5 sm:p-6">
               <div class="flex items-center justify-between gap-4 mb-4">
                 <div>
                   <h2 class="text-sm sm:text-base font-semibold tracking-tight">
                     Sentiment Glance
                   </h2>
-                  <p class="text-xs sm:text-sm text-slate-400">
+                  <p class="text-xs sm:text-sm" style="color: var(--muted);">
                     Instant read on how users are feeling across all feedback.
                   </p>
                 </div>
-                <div class="flex items-center gap-1 text-xs text-slate-400">
+                <div class="flex items-center gap-1 text-xs" style="color: var(--muted);">
                   <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
                   Realtime via /results
                 </div>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <!-- Positive -->
-                <div class="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-slate-900/60 to-slate-950/90 px-4 py-3.5 sm:py-4">
+                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4"
+                     style="border-color: color-mix(in srgb, #10b981 28%, transparent); background: linear-gradient(135deg, color-mix(in srgb, #10b981 18%, transparent), color-mix(in srgb, var(--card) 92%, transparent));">
                   <div class="flex items-center justify-between gap-2">
                     <div>
-                      <p class="text-[11px] uppercase tracking-[0.18em] text-emerald-300/80">
+                      <p class="text-[11px] uppercase tracking-[0.18em]" style="color: color-mix(in srgb, #10b981 80%, var(--text));">
                         Positive
                       </p>
-                      <p id="sentiment-positive-count" class="mt-1 text-2xl sm:text-3xl font-semibold text-emerald-100">
+                      <p id="sentiment-positive-count" class="mt-1 text-2xl sm:text-3xl font-semibold">
                         0
                       </p>
                     </div>
-                    <div class="flex flex-col items-end gap-1 text-[11px] text-emerald-300/80">
-                      <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5">
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                    <div class="flex flex-col items-end gap-1 text-[11px]" style="color: color-mix(in srgb, #10b981 85%, var(--text));">
+                      <span class="chip inline-flex items-center gap-1 rounded-full px-2 py-0.5 border"
+                            style="background: color-mix(in srgb, #10b981 14%, transparent); border-color: color-mix(in srgb, #10b981 28%, transparent);">
+                        <span class="h-1.5 w-1.5 rounded-full" style="background: #10b981;"></span>
                         Lift
                       </span>
-                      <span id="sentiment-positive-percent" class="text-[10px] text-emerald-200/80">
+                      <span id="sentiment-positive-percent" class="text-[10px]" style="color: color-mix(in srgb, #10b981 70%, var(--text));">
                         0%
                       </span>
                     </div>
@@ -328,22 +423,24 @@ export default {
                 </div>
 
                 <!-- Neutral -->
-                <div class="relative overflow-hidden rounded-2xl border border-slate-500/20 bg-gradient-to-br from-slate-400/10 via-slate-900/60 to-slate-950/90 px-4 py-3.5 sm:py-4">
+                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4"
+                     style="border-color: color-mix(in srgb, var(--card-border) 75%, transparent); background: linear-gradient(135deg, color-mix(in srgb, #94a3b8 12%, transparent), color-mix(in srgb, var(--card) 92%, transparent));">
                   <div class="flex items-center justify-between gap-2">
                     <div>
-                      <p class="text-[11px] uppercase tracking-[0.18em] text-slate-300/80">
+                      <p class="text-[11px] uppercase tracking-[0.18em]" style="color: color-mix(in srgb, var(--text) 72%, transparent);">
                         Neutral
                       </p>
-                      <p id="sentiment-neutral-count" class="mt-1 text-2xl sm:text-3xl font-semibold text-slate-100">
+                      <p id="sentiment-neutral-count" class="mt-1 text-2xl sm:text-3xl font-semibold">
                         0
                       </p>
                     </div>
-                    <div class="flex flex-col items-end gap-1 text-[11px] text-slate-300/80">
-                      <span class="inline-flex items-center gap-1 rounded-full bg-slate-400/15 px-2 py-0.5">
-                        <span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
+                    <div class="flex flex-col items-end gap-1 text-[11px]" style="color: color-mix(in srgb, var(--text) 70%, transparent);">
+                      <span class="chip inline-flex items-center gap-1 rounded-full px-2 py-0.5 border"
+                            style="background: color-mix(in srgb, #94a3b8 12%, transparent); border-color: color-mix(in srgb, #94a3b8 22%, transparent);">
+                        <span class="h-1.5 w-1.5 rounded-full" style="background: #94a3b8;"></span>
                         Baseline
                       </span>
-                      <span id="sentiment-neutral-percent" class="text-[10px] text-slate-200/80">
+                      <span id="sentiment-neutral-percent" class="text-[10px]" style="color: color-mix(in srgb, var(--text) 60%, transparent);">
                         0%
                       </span>
                     </div>
@@ -351,22 +448,24 @@ export default {
                 </div>
 
                 <!-- Negative -->
-                <div class="relative overflow-hidden rounded-2xl border border-rose-500/25 bg-gradient-to-br from-rose-500/15 via-slate-900/60 to-slate-950/90 px-4 py-3.5 sm:py-4">
+                <div class="relative overflow-hidden rounded-2xl border px-4 py-3.5 sm:py-4"
+                     style="border-color: color-mix(in srgb, #f43f5e 30%, transparent); background: linear-gradient(135deg, color-mix(in srgb, #f43f5e 18%, transparent), color-mix(in srgb, var(--card) 92%, transparent));">
                   <div class="flex items-center justify-between gap-2">
                     <div>
-                      <p class="text-[11px] uppercase tracking-[0.18em] text-rose-300/80">
+                      <p class="text-[11px] uppercase tracking-[0.18em]" style="color: color-mix(in srgb, #f43f5e 78%, var(--text));">
                         Negative
                       </p>
-                      <p id="sentiment-negative-count" class="mt-1 text-2xl sm:text-3xl font-semibold text-rose-100">
+                      <p id="sentiment-negative-count" class="mt-1 text-2xl sm:text-3xl font-semibold">
                         0
                       </p>
                     </div>
-                    <div class="flex flex-col items-end gap-1 text-[11px] text-rose-300/80">
-                      <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5">
-                        <span class="h-1.5 w-1.5 rounded-full bg-rose-400"></span>
+                    <div class="flex flex-col items-end gap-1 text-[11px]" style="color: color-mix(in srgb, #f43f5e 85%, var(--text));">
+                      <span class="chip inline-flex items-center gap-1 rounded-full px-2 py-0.5 border"
+                            style="background: color-mix(in srgb, #f43f5e 14%, transparent); border-color: color-mix(in srgb, #f43f5e 30%, transparent);">
+                        <span class="h-1.5 w-1.5 rounded-full" style="background: #f43f5e;"></span>
                         Risk
                       </span>
-                      <span id="sentiment-negative-percent" class="text-[10px] text-rose-100/80">
+                      <span id="sentiment-negative-percent" class="text-[10px]" style="color: color-mix(in srgb, #f43f5e 70%, var(--text));">
                         0%
                       </span>
                     </div>
@@ -378,19 +477,20 @@ export default {
             <!-- Theme bar chart + recent feedback table -->
             <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)] gap-6">
               <!-- Chart card -->
-              <div class="glass rounded-3xl p-5 sm:p-6 shadow-xl shadow-slate-950/60">
+              <div class="glass rounded-3xl p-5 sm:p-6">
                 <div class="flex items-center justify-between gap-3 mb-4">
                   <div>
                     <h2 class="text-sm sm:text-base font-semibold tracking-tight">
                       Theme Distribution
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-400">
+                    <p class="text-xs sm:text-sm" style="color: var(--muted);">
                       Where product teams should focus: bugs vs feature requests and more.
                     </p>
                   </div>
-                  <span class="inline-flex items-center gap-1 rounded-full border border-indigo-500/40 bg-indigo-500/10 px-2 py-0.5 text-[11px] text-indigo-200">
-                    <span class="h-1.5 w-1.5 rounded-full bg-indigo-400"></span>
-                    Chart.js · Live
+                  <span class="chip inline-flex items-center gap-1 rounded-full border soft-divider px-2 py-0.5 text-[11px]"
+                        style="background: color-mix(in srgb, var(--cf-blue) 10%, transparent); color: color-mix(in srgb, var(--text) 80%, transparent);">
+                    <span class="h-1.5 w-1.5 rounded-full" style="background: var(--cf-blue);"></span>
+                    Chart.js · Themes
                   </span>
                 </div>
                 <div class="h-64 sm:h-72">
@@ -399,41 +499,45 @@ export default {
               </div>
 
               <!-- Recent feedback table -->
-              <div class="glass rounded-3xl p-5 sm:p-6 shadow-xl shadow-slate-950/60">
+              <div class="glass rounded-3xl p-5 sm:p-6">
                 <div class="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <h2 class="text-sm sm:text-base font-semibold tracking-tight">
                       Recent Feedback
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-400">
+                    <p class="text-xs sm:text-sm" style="color: var(--muted);">
                       Enriched by Workers AI and persisted to D1.
                     </p>
                   </div>
-                  <button id="refresh-button" class="inline-flex items-center gap-1.5 rounded-full border border-slate-700/80 bg-slate-900/60 px-2.5 py-1.5 text-[11px] font-medium text-slate-200 hover:border-indigo-500/70 hover:text-indigo-100 hover:bg-slate-900 transition">
+                  <button id="refresh-button" class="chip inline-flex items-center gap-1.5 rounded-full border soft-divider px-2.5 py-1.5 text-[11px] font-medium hover:opacity-90 transition"
+                          style="background: color-mix(in srgb, var(--card) 78%, transparent); color: color-mix(in srgb, var(--text) 85%, transparent);">
                     <i data-lucide="refresh-ccw" class="w-3.5 h-3.5"></i>
                     Refresh
                   </button>
                 </div>
-                <div class="relative overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-950/40">
+                <div class="relative overflow-hidden rounded-2xl border soft-divider"
+                     style="background: color-mix(in srgb, var(--card) 65%, transparent);">
                   <div class="max-h-80 overflow-auto scrollbar-thin scrollbar-thumb-slate-700/70 scrollbar-track-slate-900/60">
                     <table class="min-w-full text-left text-xs sm:text-sm">
-                      <thead class="bg-slate-900/70 text-slate-300 sticky top-0 z-10">
+                      <thead class="sticky top-0 z-10"
+                             style="background: color-mix(in srgb, var(--card) 90%, transparent); color: color-mix(in srgb, var(--text) 70%, transparent);">
                         <tr>
                           <th class="px-3 sm:px-4 py-2.5 font-medium">Source</th>
                           <th class="px-3 sm:px-4 py-2.5 font-medium">Feedback</th>
+                          <th class="px-3 sm:px-4 py-2.5 font-medium">Status</th>
                           <th class="px-3 sm:px-4 py-2.5 font-medium">Sentiment</th>
                           <th class="px-3 sm:px-4 py-2.5 font-medium">Theme</th>
                           <th class="px-3 sm:px-4 py-2.5 font-medium">When</th>
                         </tr>
                       </thead>
-                      <tbody id="feedback-table-body" class="divide-y divide-slate-800/70">
+                      <tbody id="feedback-table-body" style="border-top: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);">
                         <!-- Rows injected by client-side JS -->
                       </tbody>
                     </table>
                   </div>
                   <div id="table-empty-state" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div class="flex flex-col items-center gap-2 text-center text-xs sm:text-sm text-slate-400">
-                      <i data-lucide="inbox" class="w-5 h-5 text-slate-500"></i>
+                    <div class="flex flex-col items-center gap-2 text-center text-xs sm:text-sm" style="color: var(--muted);">
+                      <i data-lucide="inbox" class="w-5 h-5" style="color: color-mix(in srgb, var(--muted) 75%, transparent);"></i>
                       <p>No feedback yet. Use the Simulated Ingest panel to add some.</p>
                     </div>
                   </div>
@@ -443,17 +547,19 @@ export default {
           </section>
 
           <!-- Right: Simulated Ingest sidebar -->
-          <aside class="glass rounded-3xl p-5 sm:p-6 shadow-xl shadow-slate-950/60">
+          <aside class="glass rounded-3xl p-5 sm:p-6">
             <div class="flex items-start justify-between gap-3 mb-4">
               <div>
                 <h2 class="text-sm sm:text-base font-semibold tracking-tight">
                   Simulated Ingest
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-400">
-                  Paste raw feedback, send it through the pipeline, and watch the dashboard respond.
+                <p class="text-xs sm:text-sm" style="color: var(--muted);">
+                  In production, this Sentinel typically fetches data via automated webhooks (GitHub Webhooks, Discord API).
+                  For this prototype, enter a piece of feedback below to simulate a real-time ingestion pipeline.
                 </p>
               </div>
-              <span class="inline-flex items-center gap-1 rounded-full border border-slate-700/80 bg-slate-900/70 px-2 py-0.5 text-[11px] text-slate-300">
+              <span class="chip inline-flex items-center gap-1 rounded-full border soft-divider px-2 py-0.5 text-[11px]"
+                    style="background: color-mix(in srgb, var(--cf-orange) 12%, transparent); color: color-mix(in srgb, var(--text) 80%, transparent);">
                 <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
                 Magic
               </span>
@@ -461,14 +567,15 @@ export default {
 
             <form id="ingest-form" class="space-y-4">
               <div class="space-y-2">
-                <label for="source" class="block text-xs font-medium text-slate-300">
+                <label for="source" class="block text-xs font-medium" style="color: color-mix(in srgb, var(--text) 78%, transparent);">
                   Feedback Source
                 </label>
                 <div class="relative">
                   <select
                     id="source"
                     name="source"
-                    class="block w-full rounded-2xl border border-slate-700/80 bg-slate-900/80 px-3 py-2.5 pr-10 text-xs sm:text-sm text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/60 outline-none"
+                    class="block w-full rounded-2xl border soft-divider px-3 py-2.5 pr-10 text-xs sm:text-sm outline-none"
+                    style="background: color-mix(in srgb, var(--card) 85%, transparent); color: var(--text);"
                   >
                     <option>Discord</option>
                     <option>GitHub</option>
@@ -477,13 +584,13 @@ export default {
                     <option>Other</option>
                   </select>
                   <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5" style="color: var(--muted);"></i>
                   </div>
                 </div>
               </div>
 
               <div class="space-y-2">
-                <label for="content" class="block text-xs font-medium text-slate-300">
+                <label for="content" class="block text-xs font-medium" style="color: color-mix(in srgb, var(--text) 78%, transparent);">
                   Raw Feedback
                 </label>
                 <textarea
@@ -491,14 +598,16 @@ export default {
                   name="content"
                   rows="5"
                   placeholder="Example: The analytics dashboard feels slow when loading charts, and it's hard to find the right filters."
-                  class="block w-full rounded-2xl border border-slate-700/80 bg-slate-900/80 px-3 py-2.5 text-xs sm:text-sm text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/60 outline-none resize-none"
+                  class="block w-full rounded-2xl border soft-divider px-3 py-2.5 text-xs sm:text-sm outline-none resize-none"
+                  style="background: color-mix(in srgb, var(--card) 85%, transparent); color: var(--text);"
                   required
                 ></textarea>
               </div>
 
               <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2 text-[11px] text-slate-400">
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-300">
+                <div class="flex items-center gap-2 text-[11px]" style="color: var(--muted);">
+                  <span class="inline-flex h-5 w-5 items-center justify-center rounded-full border soft-divider"
+                        style="background: color-mix(in srgb, var(--cf-blue) 12%, transparent); color: color-mix(in srgb, var(--text) 80%, transparent);">
                     <i data-lucide="cpu" class="w-3 h-3"></i>
                   </span>
                   <span>Workers AI classifies sentiment &amp; theme before persisting to D1.</span>
@@ -509,7 +618,8 @@ export default {
                 <button
                   id="analyze-button"
                   type="submit"
-                  class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-indigo-500 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-slate-950 transition disabled:cursor-not-allowed disabled:opacity-60"
+                  class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+                  style="background: linear-gradient(135deg, var(--cf-blue), color-mix(in srgb, var(--cf-orange) 70%, var(--cf-blue))); box-shadow: 0 14px 35px color-mix(in srgb, var(--cf-blue) 25%, transparent);"
                 >
                   <span id="analyze-button-label" class="inline-flex items-center gap-1">
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
@@ -522,7 +632,7 @@ export default {
                 </button>
               </div>
 
-              <p id="ingest-status" class="text-[11px] text-slate-400 min-h-[1.25rem]">
+              <p id="ingest-status" class="text-[11px] min-h-[1.25rem]" style="color: var(--muted);">
                 Paste feedback, hit Analyze, then watch sentiment &amp; themes update.
               </p>
             </form>
@@ -530,11 +640,45 @@ export default {
         </div>
       </div>
     </main>
+
+    <footer class="mt-auto border-t soft-divider">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
+           style="color: var(--muted);">
+        <span>Architected for reliability using Cloudflare Workflows &amp; D1 Database.</span>
+        <span class="chip inline-flex items-center gap-2 rounded-full border soft-divider px-3 py-1"
+              style="background: color-mix(in srgb, var(--card) 80%, transparent);">
+          <span class="h-1.5 w-1.5 rounded-full" style="background: var(--cf-orange);"></span>
+          Cloudflare Feedback Sentinel AI
+        </span>
+      </div>
+    </footer>
   </div>
 
   <script>
     // State
     let themeChart;
+
+    const THEME_KEY = "cfsentinel.theme";
+
+    function setTheme(next) {
+      const html = document.documentElement;
+      html.setAttribute("data-theme", next);
+      try { localStorage.setItem(THEME_KEY, next); } catch {}
+
+      const label = document.getElementById("theme-label");
+      const icon = document.getElementById("theme-icon");
+      if (label) label.textContent = next === "light" ? "Light" : "Dark";
+      if (icon) icon.setAttribute("data-lucide", next === "light" ? "sun" : "moon");
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function initTheme() {
+      let saved = null;
+      try { saved = localStorage.getItem(THEME_KEY); } catch {}
+      const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+      const initial = saved || (prefersLight ? "light" : "dark");
+      setTheme(initial);
+    }
 
     function computeSentimentStats(rows) {
       const counts = { Positive: 0, Neutral: 0, Negative: 0 };
@@ -581,13 +725,35 @@ export default {
       return date.toLocaleDateString();
     }
 
-    function createSourceIcon(source) {
+    // High-quality brand SVGs via SimpleIcons CDN (no inline SVG bloat).
+    function getSourceLogoUrl(source) {
       const s = (source || "").toLowerCase();
-      if (s.includes("github")) return "github";
-      if (s.includes("discord")) return "messages-square";
-      if (s === "x" || s.includes("twitter")) return "twitter";
-      if (s.includes("intercom")) return "message-circle";
-      return "globe-2";
+      // SimpleIcons slugs: github, discord, x, intercom
+      if (s.includes("github")) return "https://cdn.simpleicons.org/github/ffffff";
+      if (s.includes("discord")) return "https://cdn.simpleicons.org/discord/ffffff";
+      if (s === "x" || s.includes("twitter")) return "https://cdn.simpleicons.org/x/ffffff";
+      if (s.includes("intercom")) return "https://cdn.simpleicons.org/intercom/ffffff";
+      return "https://cdn.simpleicons.org/cloudflare/ffffff";
+    }
+
+    function getStatus(row) {
+      const sentiment = row.sentiment || "Neutral";
+      const theme = row.theme || "";
+      // Professional "console" status indicators.
+      if (sentiment === "Negative" || theme === "Bug") {
+        return { label: "Needs attention", tone: "rose" };
+      }
+      if (theme === "Feature Request" || sentiment === "Positive") {
+        return { label: "Opportunity", tone: "blue" };
+      }
+      return { label: "Monitoring", tone: "slate" };
+    }
+
+    function statusChipClass(tone) {
+      const base = "chip inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-[11px] font-medium border";
+      if (tone === "rose") return base + " border-rose-500/40 bg-rose-500/10 text-rose-200";
+      if (tone === "blue") return base + " border-blue-500/40 bg-blue-500/10 text-blue-100";
+      return base + " border-slate-500/35 bg-slate-500/10 text-slate-200";
     }
 
     function createSentimentPill(sentiment) {
@@ -652,10 +818,10 @@ export default {
               label: "Feedback count",
               data,
               backgroundColor: [
-                "rgba(56, 189, 248, 0.75)",   // UI/UX
-                "rgba(248, 113, 113, 0.85)", // Bug
-                "rgba(245, 158, 11, 0.85)",  // Performance
-                "rgba(129, 140, 248, 0.9)",  // Feature Request
+                "rgba(0, 81, 195, 0.55)",    // UI/UX (CF blue)
+                "rgba(243, 128, 32, 0.82)",  // Bug (CF orange emphasis)
+                "rgba(245, 158, 11, 0.78)",  // Performance (amber)
+                "rgba(0, 81, 195, 0.85)",    // Feature Request (CF blue)
               ],
               borderRadius: 8,
               borderWidth: 0,
@@ -668,13 +834,13 @@ export default {
           plugins: {
             legend: {
               labels: {
-                color: "#e5e7eb",
+                color: getComputedStyle(document.documentElement).getPropertyValue("--text") || "#e5e7eb",
                 font: { size: 11 },
               },
             },
             tooltip: {
-              backgroundColor: "rgba(15,23,42,0.95)",
-              borderColor: "rgba(148,163,184,0.6)",
+              backgroundColor: "rgba(26,26,26,0.95)",
+              borderColor: "rgba(148,163,184,0.45)",
               borderWidth: 1,
               padding: 10,
               titleFont: { size: 11 },
@@ -684,7 +850,7 @@ export default {
           scales: {
             x: {
               ticks: {
-                color: "#9ca3af",
+                color: "rgba(148,163,184,0.9)",
                 font: { size: 11 },
               },
               grid: {
@@ -693,12 +859,12 @@ export default {
             },
             y: {
               ticks: {
-                color: "#6b7280",
+                color: "rgba(148,163,184,0.7)",
                 font: { size: 10 },
                 precision: 0,
               },
               grid: {
-                color: "rgba(31,41,55,0.9)",
+                color: "rgba(148,163,184,0.16)",
               },
             },
           },
@@ -720,31 +886,45 @@ export default {
 
       for (const row of recent) {
         const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-900/60 transition";
+        tr.className = "transition";
+        tr.style.borderTop = "1px solid color-mix(in srgb, var(--card-border) 45%, transparent)";
+        tr.addEventListener("mouseenter", () => { tr.style.background = "color-mix(in srgb, var(--card) 80%, transparent)"; });
+        tr.addEventListener("mouseleave", () => { tr.style.background = "transparent"; });
 
-        const srcIcon = createSourceIcon(row.source);
+        const logoUrl = getSourceLogoUrl(row.source);
         const srcCell = document.createElement("td");
-        srcCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm text-slate-200 whitespace-nowrap";
+        srcCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm whitespace-nowrap";
         srcCell.innerHTML = \`
           <div class="flex items-center gap-2">
-            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-900/80 border border-slate-700/80">
-              <i data-lucide="\${srcIcon}" class="w-3.5 h-3.5 text-slate-200"></i>
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full border soft-divider"
+                  style="background: color-mix(in srgb, var(--card) 86%, transparent);">
+              <img class="brand-logo" src="\${logoUrl}" alt="" width="14" height="14" />
             </span>
-            <span class="max-w-[8rem] truncate" title="\${row.source || ""}">\${row.source || "Unknown"}</span>
+            <span class="max-w-[8rem] truncate" title="\${row.source || ""}" style="color: color-mix(in srgb, var(--text) 90%, transparent);">\${row.source || "Unknown"}</span>
           </div>
         \`;
 
         const contentCell = document.createElement("td");
-        contentCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm text-slate-200";
+        contentCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm";
         const safeContent = row.content || "";
         contentCell.innerHTML = \`
-          <div class="line-clamp-3" title="\${safeContent.replace(/"/g, '&quot;')}">
+          <div class="line-clamp-3" title="\${safeContent.replace(/"/g, '&quot;')}" style="color: color-mix(in srgb, var(--text) 88%, transparent);">
             \${safeContent}
           </div>
         \`;
 
+        const statusCell = document.createElement("td");
+        statusCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm whitespace-nowrap";
+        const status = getStatus(row);
+        statusCell.innerHTML = \`
+          <span class="\${statusChipClass(status.tone)}" title="Derived from sentiment + theme.">
+            <span class="h-1.5 w-1.5 rounded-full" style="\${status.tone === "rose" ? "background:#fb7185" : status.tone === "blue" ? "background: var(--cf-blue)" : "background:#94a3b8"}"></span>
+            \${status.label}
+          </span>
+        \`;
+
         const sentimentCell = document.createElement("td");
-        sentimentCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm text-slate-200 whitespace-nowrap";
+        sentimentCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm whitespace-nowrap";
         const sentiment = row.sentiment || "Neutral";
         sentimentCell.innerHTML = \`
           <span class="\${createSentimentPill(sentiment)}">
@@ -753,7 +933,7 @@ export default {
         \`;
 
         const themeCell = document.createElement("td");
-        themeCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm text-slate-200 whitespace-nowrap";
+        themeCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm whitespace-nowrap";
         const theme = row.theme || "Feature Request";
         themeCell.innerHTML = \`
           <span class="\${createThemePill(theme)}">
@@ -762,11 +942,13 @@ export default {
         \`;
 
         const whenCell = document.createElement("td");
-        whenCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm text-slate-400 whitespace-nowrap";
+        whenCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm whitespace-nowrap";
+        whenCell.style.color = "var(--muted)";
         whenCell.textContent = formatRelativeTime(row.timestamp);
 
         tr.appendChild(srcCell);
         tr.appendChild(contentCell);
+        tr.appendChild(statusCell);
         tr.appendChild(sentimentCell);
         tr.appendChild(themeCell);
         tr.appendChild(whenCell);
@@ -884,6 +1066,17 @@ export default {
     }
 
     window.addEventListener("DOMContentLoaded", () => {
+      initTheme();
+      const toggle = document.getElementById("theme-toggle");
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          const current = document.documentElement.getAttribute("data-theme") || "dark";
+          setTheme(current === "dark" ? "light" : "dark");
+          // Chart colors depend on theme; recreate chart for perfect contrast.
+          if (themeChart) { themeChart.destroy(); themeChart = null; }
+          refreshDashboard({ silent: true });
+        });
+      }
       const form = document.getElementById("ingest-form");
       if (form) {
         form.addEventListener("submit", handleSimulatedIngest);
