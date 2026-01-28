@@ -6,7 +6,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "cloudflarepm",
 	"main": "src/index.ts",
-	"compatibility_date": "2025-09-27",
+	"compatibility_date": "2026-01-28",
 	"observability": {
 		"enabled": true
 	},
@@ -16,7 +16,7 @@
 			"binding": "MY_WORKFLOW",
 			"class_name": "MyWorkflow"
 		}
-	]
+	],
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
@@ -45,4 +45,14 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
 	 */
 	// "services": [  {   "binding": "MY_SERVICE",   "service": "my-service"  } ]
+	"ai": {
+		"binding": "AI"
+	},
+	"d1_databases": [
+	  {
+		"binding": "DB",
+		"database_name": "feedback_db",
+		"database_id": "b5ed872e-697a-433e-8ba9-b6e05b2c68d0" 
+	  }
+	]
 }
