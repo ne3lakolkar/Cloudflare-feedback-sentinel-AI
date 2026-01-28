@@ -271,7 +271,7 @@ export default {
       --cf-slate: #1A1A1A;
 
       --ease: 0.3s ease;
-      --pulse-duration: 18s; /* shared rhythm for background + status */
+      --pulse-duration: 20s; /* shared rhythm for background + status */
     }
 
     html {
@@ -292,9 +292,9 @@ export default {
     html[data-theme="light"] {
       color-scheme: light;
       --bg: #F8FAFC; /* crisp base */
-      --text: #0f172a;
-      --muted: rgba(51, 65, 85, 0.72);
-      --glass-bg: rgba(255, 255, 255, 0.40); /* bg-white/40 */
+      --text: #0F172A; /* slate-900 primary */
+      --muted: #475569; /* slate-600 secondary */
+      --glass-bg: rgba(255, 255, 255, 0.80); /* bg-white/80 for readability */
       --card-border: rgba(15, 23, 42, 0.12);
       --shadow: rgba(15, 23, 42, 0.10);
     }
@@ -306,17 +306,14 @@ export default {
     }
 
     /* Pulsating Mesh Gradient (fixed behind glass) */
-    @keyframes pulse-gradient {
+    @keyframes breathe {
       0% {
-        transform: translate3d(-1.5%, -1%, 0) scale(1);
         opacity: 0.95;
       }
       50% {
-        transform: translate3d(1.5%, 1%, 0) scale(1.04);
-        opacity: 0.82;
+        opacity: 0.78;
       }
       100% {
-        transform: translate3d(-1.5%, -1%, 0) scale(1);
         opacity: 0.95;
       }
     }
@@ -333,18 +330,50 @@ export default {
       position: fixed;
       inset: -30vh -30vw; /* oversized to cover overscroll gaps */
       z-index: -1;
-      /* Three "breathing" blobs: orange, blue, indigo */
+      /* Three high-blur blobs: Orange, Indigo, Deep Slate (reduced blue saturation) */
       background:
-        radial-gradient(900px 600px at 22% 18%, rgba(243, 128, 32, 0.55), transparent 62%),
-        radial-gradient(980px 650px at 78% 22%, rgba(0, 81, 195, 0.52), transparent 62%),
-        radial-gradient(1050px 720px at 52% 78%, rgba(79, 70, 229, 0.40), transparent 64%),
+        radial-gradient(1100px 800px at var(--o-x, 22%) var(--o-y, 18%), rgba(243, 128, 32, 0.55), transparent 62%),
+        radial-gradient(1200px 850px at var(--i-x, 74%) var(--i-y, 22%), rgba(79, 70, 229, 0.34), transparent 64%),
+        radial-gradient(1300px 900px at var(--s-x, 55%) var(--s-y, 85%), rgba(15, 23, 42, 0.55), transparent 70%),
         linear-gradient(180deg, var(--bg), var(--bg));
       background-attachment: fixed;
       background-repeat: no-repeat;
       background-size: cover;
       pointer-events: none;
       transform: translateZ(0);
-      animation: pulse-gradient var(--pulse-duration) ease-in-out infinite;
+      filter: blur(0px); /* gradients are already large/soft; keep crisp glass edges */
+      /* Animate via CSS variables for subtle, living motion */
+      animation: breathe var(--pulse-duration) ease-in-out infinite;
+    }
+
+    /* Animate blob anchor points + opacity (subtle) */
+    body::before {
+      --o-x: 22%;
+      --o-y: 18%;
+      --i-x: 74%;
+      --i-y: 22%;
+      --s-x: 55%;
+      --s-y: 85%;
+    }
+    @keyframes breathe {
+      0% {
+        --o-x: 22%; --o-y: 18%;
+        --i-x: 74%; --i-y: 22%;
+        --s-x: 55%; --s-y: 85%;
+        opacity: 0.95;
+      }
+      50% {
+        --o-x: 28%; --o-y: 14%;
+        --i-x: 68%; --i-y: 30%;
+        --s-x: 52%; --s-y: 78%;
+        opacity: 0.80;
+      }
+      100% {
+        --o-x: 22%; --o-y: 18%;
+        --i-x: 74%; --i-y: 22%;
+        --s-x: 55%; --s-y: 85%;
+        opacity: 0.95;
+      }
     }
 
     .glass {
@@ -417,17 +446,19 @@ export default {
               <span class="relative inline-flex h-2.5 w-2.5 items-center justify-center">
                 <!-- Sync pulse rhythm with background via --pulse-duration -->
                 <span class="absolute inline-flex h-2.5 w-2.5 rounded-full opacity-40"
-                      style="background: #22c55e; animation: ping var(--pulse-duration) ease-in-out infinite;"></span>
-                <span class="inline-flex h-2 w-2 rounded-full" style="background:#22c55e; box-shadow: 0 0 0.65rem rgba(34,197,94,0.75), 0 0 1.35rem rgba(34,197,94,0.35);"></span>
+                      style="background: #F38020; animation: ping var(--pulse-duration) ease-in-out infinite;"></span>
+                <span class="inline-flex h-2 w-2 rounded-full"
+                      style="background:#F38020; box-shadow:
+                        0 0 0.55rem rgba(243,128,32,0.85),
+                        0 0 1.25rem rgba(243,128,32,0.45),
+                        0 0 2.2rem rgba(79,70,229,0.22);"></span>
               </span>
               <span>Sentinel active</span>
             </span>
             <div class="pointer-events-none absolute right-0 top-full mt-2 hidden group-hover:block">
               <div class="glass rounded-2xl px-3 py-2 text-[11px] leading-snug"
                    style="min-width: 20rem; color: color-mix(in srgb, var(--text) 90%, transparent);">
-                Active on: <span class="font-semibold">MY_WORKFLOW</span>
-                <span class="mx-1 opacity-60">|</span>
-                Deployed at: <span class="font-semibold">cloudflarepm.cloudflare-neelakolkar.workers.dev</span>
+                Intelligence Pipeline Active · <span class="font-semibold">MY_WORKFLOW</span>
               </div>
             </div>
           </div>
@@ -829,7 +860,8 @@ export default {
     }
 
     function statusChipClass(tone) {
-      const base = "chip inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-[11px] font-medium border";
+      // Extra horizontal padding prevents label collision in table-fixed layouts.
+      const base = "chip inline-flex items-center gap-2 rounded-full px-3 py-0.5 text-[11px] font-medium border";
       if (tone === "rose") return base + " border-rose-500/40 bg-rose-500/10 text-rose-200";
       if (tone === "blue") return base + " border-blue-500/40 bg-blue-500/10 text-blue-100";
       return base + " border-slate-500/35 bg-slate-500/10 text-slate-200";
@@ -987,7 +1019,7 @@ export default {
         contentCell.className = "px-3 sm:px-4 py-3 align-top text-xs sm:text-sm";
         const safeContent = row.content || "";
         contentCell.innerHTML = \`
-          <div class="line-clamp-2 break-words" title="\${safeContent.replace(/"/g, '&quot;')}" style="color: color-mix(in srgb, var(--text) 88%, transparent);">
+          <div class="truncate" title="\${safeContent.replace(/"/g, '&quot;')}" style="max-width: 100%; color: color-mix(in srgb, var(--text) 88%, transparent);">
             \${safeContent}
           </div>
         \`;
