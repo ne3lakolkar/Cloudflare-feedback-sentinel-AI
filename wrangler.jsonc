@@ -49,10 +49,10 @@
 		"binding": "AI"
 	},
 	"d1_databases": [
-	  {
-		"binding": "DB",
-		"database_name": "feedback_db",
-		"database_id": "b5ed872e-697a-433e-8ba9-b6e05b2c68d0" 
-	  }
+		{
+			"binding": "DB",
+			"database_name": "feedback_db",
+			"database_id": "b5ed872e-697a-433e-8ba9-b6e05b2c68d0"
+		}
 	]
 }
