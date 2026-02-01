@@ -859,38 +859,67 @@ export default {
       return { label: "Monitoring", tone: "slate" };
     }
 
-    function statusChipClass(tone) {
-      // Extra horizontal padding prevents label collision in table-fixed layouts.
-      const base = "chip inline-flex items-center gap-2 rounded-full px-3 py-0.5 text-[11px] font-medium border";
-      if (tone === "rose") return base + " border-rose-500/40 bg-rose-500/10 text-rose-200";
-      if (tone === "blue") return base + " border-blue-500/40 bg-blue-500/10 text-blue-100";
-      return base + " border-slate-500/35 bg-slate-500/10 text-slate-200";
+      function statusChipClass(tone) {
+    const isLight = isLightTheme(); // Using your existing helper
+    const base = "chip inline-flex items-center gap-2 rounded-full px-3 py-0.5 text-[11px] font-bold border transition-colors";
+    
+    if (tone === "rose") {
+      return isLight 
+        ? base + " border-rose-200 bg-rose-50 text-rose-950" 
+        : base + " border-rose-500/40 bg-rose-500/10 text-rose-200";
     }
+    if (tone === "blue") {
+      return isLight 
+        ? base + " border-blue-200 bg-blue-50 text-blue-950" 
+        : base + " border-blue-500/40 bg-blue-500/10 text-blue-100";
+    }
+    return isLight 
+      ? base + " border-slate-300 bg-slate-100 text-slate-900" 
+      : base + " border-slate-500/35 bg-slate-500/10 text-slate-200";
+  }
 
-    function createSentimentPill(sentiment) {
-      const base = "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium";
-      if (sentiment === "Positive") {
-        return base + " bg-emerald-500/10 text-emerald-200 border border-emerald-500/40";
-      }
-      if (sentiment === "Negative") {
-        return base + " bg-rose-500/10 text-rose-200 border border-rose-500/50";
-      }
-      return base + " bg-slate-500/10 text-slate-200 border border-slate-500/40";
+      function createSentimentPill(sentiment) {
+    const isLight = isLightTheme();
+    const base = "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-bold border";
+    
+    if (sentiment === "Positive") {
+      return isLight 
+        ? base + " bg-emerald-100 text-emerald-950 border-emerald-300" 
+        : base + " bg-emerald-500/10 text-emerald-200 border border-emerald-500/40";
     }
+    if (sentiment === "Negative") {
+      return isLight 
+        ? base + " bg-rose-100 text-rose-950 border-rose-300" 
+        : base + " bg-rose-500/10 text-rose-200 border border-rose-500/50";
+    }
+    return isLight 
+      ? base + " bg-slate-200 text-slate-900 border-slate-400" 
+      : base + " bg-slate-500/10 text-slate-200 border border-slate-500/40";
+  }
 
-    function createThemePill(theme) {
-      const base = "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium";
-      if (theme === "Bug") {
-        return base + " bg-rose-500/10 text-rose-200 border border-rose-500/40";
-      }
-      if (theme === "Feature Request") {
-        return base + " bg-indigo-500/10 text-indigo-200 border border-indigo-500/40";
-      }
-      if (theme === "Performance") {
-        return base + " bg-amber-500/10 text-amber-200 border border-amber-500/40";
-      }
-      return base + " bg-sky-500/10 text-sky-200 border border-sky-500/40";
+      function createThemePill(theme) {
+    const isLight = isLightTheme();
+    const base = "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-bold border";
+    
+    if (theme === "Bug") {
+      return isLight 
+        ? base + " bg-rose-100 text-rose-950 border-rose-300" 
+        : base + " bg-rose-500/10 text-rose-200 border border-rose-500/40";
     }
+    if (theme === "Feature Request") {
+      return isLight 
+        ? base + " bg-indigo-100 text-indigo-950 border-indigo-300" 
+        : base + " bg-indigo-500/10 text-indigo-200 border border-indigo-500/40";
+    }
+    if (theme === "Performance") {
+      return isLight 
+        ? base + " bg-amber-100 text-amber-950 border-amber-300" 
+        : base + " bg-amber-500/10 text-amber-200 border border-amber-500/40";
+    }
+    return isLight 
+      ? base + " bg-sky-100 text-sky-950 border-sky-300" 
+      : base + " bg-sky-500/10 text-sky-200 border border-sky-500/40";
+  }
 
     async function fetchResults() {
       const res = await fetch("/results");
