@@ -284,7 +284,7 @@ export default {
       color-scheme: dark;
       --bg: #0F172A; /* deep slate base */
       --text: #f8fafc;
-      --muted: rgba(59, 59, 59, 0.75);
+      --muted: rgba(148, 163, 184, 0.75);
       --glass-bg: rgba(255, 255, 255, 0.05); /* bg-white/5 */
       --card-border: rgba(148, 163, 184, 0.18);
       --shadow: rgba(0, 0, 0, 0.55);
@@ -293,7 +293,7 @@ export default {
       color-scheme: light;
       --bg: #F8FAFC; /* crisp base */
       --text: #0F172A; /* slate-900 primary */
-      --muted: #475569; /* slate-600 secondary */
+      --muted:rgb(0, 0, 0); /* slate-600 secondary */
       --glass-bg: rgba(255, 255, 255, 0.80); /* bg-white/80 for readability */
       --card-border: rgba(15, 23, 42, 0.12);
       --shadow: rgba(15, 23, 42, 0.10);
