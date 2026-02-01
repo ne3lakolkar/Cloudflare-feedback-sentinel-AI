@@ -446,7 +446,7 @@ export default {
               <span class="relative inline-flex h-2.5 w-2.5 items-center justify-center">
                 <!-- Sync pulse rhythm with background via --pulse-duration -->
                 <span class="absolute inline-flex h-2.5 w-2.5 rounded-full opacity-40"
-                      style="background: #F38020; animation: ping var(--pulse-duration) ease-in-out infinite;"></span>
+                      style="background:rgb(9, 186, 0); animation: ping var(--pulse-duration) ease-in-out infinite;"></span>
                 <span class="inline-flex h-2 w-2 rounded-full"
                       style="background:#F38020; box-shadow:
                         0 0 0.55rem rgba(243,128,32,0.85),
