@@ -625,8 +625,8 @@ export default {
                     <table class="min-w-full table-fixed text-left text-xs sm:text-sm">
                       <thead class="sticky top-0 z-10"
                              style="background: color-mix(in srgb, var(--card) 90%, transparent); color: color-mix(in srgb, var(--text) 70%, transparent);">
-                        <tr>
-                          <th class="w-[9.5rem] px-3 sm:px-4 py-2.5 font-medium">Source</th>
+                        <tr class="after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:bg-slate-700/50">
+                          <th class="w-[8rem] px-3 sm:px-4 py-2.5 font-semibold">Source</th>
                           <th class="px-3 sm:px-4 py-2.5 font-medium">Feedback</th>
                           <th class="w-[9.5rem] px-3 sm:px-4 py-2.5 font-medium">Status</th>
                           <th class="w-[7.5rem] px-3 sm:px-4 py-2.5 font-medium">Sentiment</th>
