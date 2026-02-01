@@ -284,7 +284,7 @@ export default {
       color-scheme: dark;
       --bg: #0F172A; /* deep slate base */
       --text: #f8fafc;
-      --muted: rgba(148, 163, 184, 0.75);
+      --muted: rgba(59, 59, 59, 0.75);
       --glass-bg: rgba(255, 255, 255, 0.05); /* bg-white/5 */
       --card-border: rgba(148, 163, 184, 0.18);
       --shadow: rgba(0, 0, 0, 0.55);
