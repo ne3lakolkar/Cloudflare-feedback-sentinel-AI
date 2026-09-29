@@ -118,7 +118,7 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 						].join("\n");
 
 					const aiResponse: any = await this.env.AI.run(
-						"@cf/meta/llama-3-8b-instruct",
+						"@cf/google/gemma-7b-it-lora",
 						{
 							messages: [
 								{ role: "system", content: systemPrompt },
