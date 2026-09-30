@@ -388,6 +388,17 @@ export default {
       transition: background-color var(--ease), border-color var(--ease), box-shadow var(--ease);
     }
 
+    /* Opaque sticky header so scrolled rows don't show through */
+    .table-head th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: color-mix(in srgb, var(--bg) 94%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: inset 0 -1px 0 var(--card-border);
+    }
+
     .soft-divider {
       border-color: color-mix(in srgb, var(--card-border) 55%, transparent);
     }
@@ -623,8 +634,8 @@ export default {
                   <div class="max-h-80 overflow-auto scrollbar-thin scrollbar-thumb-slate-700/70 scrollbar-track-slate-900/60">
                     <!-- table-fixed + explicit column widths prevents badge/content collisions -->
                     <table class="min-w-full table-fixed text-left text-xs sm:text-sm">
-                      <thead class="sticky top-0 z-10"
-                             style="background: color-mix(in srgb, var(--card) 90%, transparent); color: color-mix(in srgb, var(--text) 70%, transparent);">
+                      <thead class="table-head"
+                             style="color: color-mix(in srgb, var(--text) 70%, transparent);">
                         <tr>
                           <th class="w-[9.5rem] px-3 sm:px-4 py-2.5 font-medium">Source</th>
                           <th class="px-3 sm:px-4 py-2.5 font-medium">Feedback</th>
