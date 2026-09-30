@@ -51,6 +51,27 @@ export type Sentiment = "Positive" | "Neutral" | "Negative";
 export type Theme = "UI/UX" | "Bug" | "Performance" | "Feature Request";
 
 /**
+ * Stored when the model could not produce valid labels, so failures are
+ * shown as "Needs review" instead of masquerading as Neutral / Feature Request.
+ */
+export const UNCLASSIFIED = "Unclassified" as const;
+
+const SENTIMENTS: Sentiment[] = ["Positive", "Neutral", "Negative"];
+const THEMES: Theme[] = ["UI/UX", "Bug", "Performance", "Feature Request"];
+
+/** JSON Mode–capable model; the schema restricts output to the exact labels above. */
+const AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+
+const CLASSIFICATION_SCHEMA = {
+	type: "object",
+	properties: {
+		sentiment: { type: "string", enum: SENTIMENTS },
+		theme: { type: "string", enum: THEMES },
+	},
+	required: ["sentiment", "theme"],
+};
+
+/**
  * Row as stored in the D1 `feedback` table.
  * (Assumes there is a numeric primary key `id` and an ISO timestamp column.)
  */
@@ -58,8 +79,8 @@ export interface FeedbackRecord {
 	id: number;
 	source: string;
 	content: string;
-	sentiment: Sentiment;
-	theme: Theme;
+	sentiment: Sentiment | typeof UNCLASSIFIED;
+	theme: Theme | typeof UNCLASSIFIED;
 	timestamp: string;
 }
 
@@ -117,64 +138,41 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 							`"""${item.content}"""`,
 						].join("\n");
 
-					const aiResponse: any = await this.env.AI.run(
-						"@cf/google/gemma-7b-it-lora",
-						{
-							messages: [
-								{ role: "system", content: systemPrompt },
-								{ role: "user", content: userPrompt },
-							],
-						},
-					);
-
-					// Text models return a `response` string which should be JSON per our prompt.
-					const rawText: string =
-						typeof aiResponse?.response === "string"
-							? aiResponse.response
-							: JSON.stringify(aiResponse);
-
-					let sentiment: Sentiment = "Neutral";
-					let theme: Theme = "Feature Request";
+					let sentiment: Sentiment | typeof UNCLASSIFIED = UNCLASSIFIED;
+					let theme: Theme | typeof UNCLASSIFIED = UNCLASSIFIED;
 
 					try {
-						const parsed = JSON.parse(rawText) as {
-							sentiment?: string;
-							theme?: string;
-						};
+						const aiResponse: any = await this.env.AI.run(
+							AI_MODEL as any,
+							{
+								messages: [
+									{ role: "system", content: systemPrompt },
+									{ role: "user", content: userPrompt },
+								],
+								response_format: {
+									type: "json_schema",
+									json_schema: CLASSIFICATION_SCHEMA,
+								},
+							} as any,
+						);
 
-						const sentimentUpper = (parsed.sentiment ?? "").trim();
-						const themeValue = (parsed.theme ?? "").trim();
+						// JSON Mode returns an object; fall back to parsing if a string comes back.
+						const response = aiResponse?.response;
+						const parsed =
+							typeof response === "string" ? JSON.parse(response) : response;
 
-						const validSentiments: Sentiment[] = [
-							"Positive",
-							"Neutral",
-							"Negative",
-						];
-						const validThemes: Theme[] = [
-							"UI/UX",
-							"Bug",
-							"Performance",
-							"Feature Request",
-						];
+						const sentimentValue = String(parsed?.sentiment ?? "").trim() as Sentiment;
+						const themeValue = String(parsed?.theme ?? "").trim() as Theme;
 
-						if (
-							validSentiments.includes(
-								sentimentUpper as Sentiment,
-							)
-						) {
-							sentiment = sentimentUpper as Sentiment;
-						}
-
-						if (validThemes.includes(themeValue as Theme)) {
-							theme = themeValue as Theme;
+						if (SENTIMENTS.includes(sentimentValue) && THEMES.includes(themeValue)) {
+							sentiment = sentimentValue;
+							theme = themeValue;
+						} else {
+							console.warn("AI returned invalid labels:", parsed);
 						}
 					} catch (err) {
-						// If parsing fails, we still proceed with safe defaults.
-						console.warn(
-							"Failed to parse AI response as JSON:",
-							err,
-							rawText,
-						);
+						// Persist as Unclassified so the dashboard shows "Needs review".
+						console.warn("AI classification failed:", err);
 					}
 
 					return { sentiment, theme };
@@ -860,6 +858,10 @@ export default {
     function getStatus(row) {
       const sentiment = row.sentiment || "Neutral";
       const theme = row.theme || "";
+      // AI could not classify this item; its labels carry no signal.
+      if (sentiment === "Unclassified" || theme === "Unclassified") {
+        return { label: "Needs review", tone: "slate" };
+      }
       // Professional "console" status indicators.
       if (sentiment === "Negative" || theme === "Bug") {
         return { label: "Needs attention", tone: "rose" };
